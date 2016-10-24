@@ -2,7 +2,7 @@
 
 <table style="border-collapse: collapse">
 <tr>
-<td style="vertical-align: top">
+<td style="vertical-align: top" valign="top">
     <strong>Abstract from the paper</strong>
     <p>We report a method to convert discrete representations of molecules to and from a multidimensional continuous representation. This generative model allows efficient search and optimization through open-ended spaces of chemical compounds.</p>
     <p>We train deep neural networks on hundreds of thousands of existing chemical structures to construct two coupled functions: an encoder and a decoder. The encoder converts the discrete representation of a molecule into a real-valued continuous vector, and the decoder converts these continuous vectors back to the discrete representation from this latent space.</p>
@@ -51,5 +51,13 @@ Note that when using `sample_latent.py`, the `--visualize` flag will use PCA and
 Example (using [bh_tsne](https://github.com/lvdmaaten/bhtsne)):
 
 ```python sample_latent.py data/processed.h5 model.h5 > data/latent.dat
+
 cat data/latent.dat | python bhtsne.py -d 2 -p 0.1 > data/result.dat
+
 python plot.py data/result.dat```
+
+## Performance
+
+After 30 epochs on a 500,000 molecule extract from ChEMBL 21 (~7 hours on a NVIDIA GTX 1080), I'm seeing a loss of 0.26 and a reconstruction accuracy of 0.98. Using t-SNE to visualize the latent representation (looking to reproduce figure 3 of the paper) doesn't look good, though, so I must be missing something:
+
+<img src="images/latent_tsne.png" width="300" />
