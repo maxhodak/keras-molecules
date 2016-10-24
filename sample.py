@@ -9,15 +9,10 @@ from autoencoder.model import MoleculeVAE
 from autoencoder.utils import one_hot_array, one_hot_index, from_one_hot_array, \
     decode_smiles_from_indexes, load_dataset
 
-from sklearn.manifold import TSNE
-from sklearn.decomposition import PCA
-
 from pylab import figure, axes, scatter, title, show
 
 from rdkit import Chem
 from rdkit.Chem import Draw
-
-from keras.models import Sequential, Model, load_model
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='Molecular autoencoder network')

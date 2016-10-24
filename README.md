@@ -46,7 +46,7 @@ There are two scripts here for sampling from a trained model.
 - `sample.py` is useful for just testing the autoencoder.
 - `sample_latent.py` will yield the value of the `Dense(292)` tensor that is the informational bottleneck in the model for visualization or analysis.
 
-Example (using [https://github.com/lvdmaaten/bhtsne](bh_tsne)):
+Example (using [bh_tsne](https://github.com/lvdmaaten/bhtsne):
 
 ```python sample_latent.py data/processed.h5 model.h5 > data/latent.dat
 cat data/latent.dat | python bhtsne.py -d 2 -p 0.1 > data/result.dat
