@@ -7,15 +7,19 @@
     <p>We report a method to convert discrete representations of molecules to and from a multidimensional continuous representation. This generative model allows efficient search and optimization through open-ended spaces of chemical compounds.</p>
     <p>We train deep neural networks on hundreds of thousands of existing chemical structures to construct two coupled functions: an encoder and a decoder. The encoder converts the discrete representation of a molecule into a real-valued continuous vector, and the decoder converts these continuous vectors back to the discrete representation from this latent space.</p>
     <p>Continuous representations allow us to automatically generate novel chemical structures by performing simple operations in the latent space, such as decoding random vectors, perturbing known chemical structures, or interpolating between molecules. Continuous representations also allow the use of powerful gradient-based optimization to efficiently guide the search for optimized functional compounds. We demonstrate our method in the design of drug-like molecules as well as organic light-emitting diodes.</p>
+    <p>
+        <strong>Link to the paper</strong><br />
+        <a href="https://arxiv.org/abs/1610.02415">arXiv</a>
+    </p>
 </td><td width="300">
-<img src="images/network.png" width="300"></img>
+<img src="images/network.png" width="300" /></img>
 </td>
 </tr>
 </table>
 
 ## Requirements
 
-Install using `pip install -r requirements.txt`.
+Install using `pip install -r requirements.txt`
 
 ## Preparing the data
 
@@ -50,11 +54,13 @@ Note that when using `sample_latent.py`, the `--visualize` flag will use PCA and
 
 Example (using [bh_tsne](https://github.com/lvdmaaten/bhtsne)):
 
-```python sample_latent.py data/processed.h5 model.h5 > data/latent.dat
+```
+python sample_latent.py data/processed.h5 model.h5 > data/latent.dat
 
 cat data/latent.dat | python bhtsne.py -d 2 -p 0.1 > data/result.dat
 
-python plot.py data/result.dat```
+python plot.py data/result.dat
+```
 
 ## Performance
 
