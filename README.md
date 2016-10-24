@@ -23,10 +23,10 @@ Install using `pip install -r requirements.txt`
 
 ## Preparing the data
 
-To train the network you need a lot of SMILES strings. The `preprocess.py` script assumes you have an HDF5 file with that contains a table structure, one column of which is named `structure` and contains one SMILES string no longer than 120 characters per row. The script then:
+To train the network you need a lot of SMILES strings. The `preprocess.py` script assumes you have an HDF5 file that contains a table structure, one column of which is named `structure` and contains one SMILES string no longer than 120 characters per row. The script then:
 
 - Normalizes the length of each string to 120 by appending whitespace as needed.
-- Builds a list of the unique characters used in the dataset. (The "charset".)
+- Builds a list of the unique characters used in the dataset. (The "charset")
 - Substitutes each character in each SMILES string with the integer ID of its location in the charset.
 - Converts each character position to a one-hot vector of len(charset).
 - Saves this matrix to the specified output file.
@@ -64,6 +64,4 @@ python plot.py data/result.dat
 
 ## Performance
 
-After 30 epochs on a 500,000 molecule extract from ChEMBL 21 (~7 hours on a NVIDIA GTX 1080), I'm seeing a loss of 0.26 and a reconstruction accuracy of 0.98. Using t-SNE to visualize the latent representation (looking to reproduce figure 3 of the paper) doesn't look good, though, so I must be missing something:
-
-<img src="images/latent_tsne.png" width="300" />
+After 30 epochs on a 500,000 molecule extract from ChEMBL 21 (~7 hours on a NVIDIA GTX 1080), I'm seeing a loss of 0.26 and a reconstruction accuracy of 0.98.
