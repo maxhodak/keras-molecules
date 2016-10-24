@@ -2,7 +2,7 @@
 
 <table style="border-collapse: collapse">
 <tr>
-<td>
+<td style="vertical-align: top">
     <strong>Abstract from the paper</strong>
     <p>We report a method to convert discrete representations of molecules to and from a multidimensional continuous representation. This generative model allows efficient search and optimization through open-ended spaces of chemical compounds.</p>
     <p>We train deep neural networks on hundreds of thousands of existing chemical structures to construct two coupled functions: an encoder and a decoder. The encoder converts the discrete representation of a molecule into a real-valued continuous vector, and the decoder converts these continuous vectors back to the discrete representation from this latent space.</p>
@@ -46,7 +46,9 @@ There are two scripts here for sampling from a trained model.
 - `sample.py` is useful for just testing the autoencoder.
 - `sample_latent.py` will yield the value of the `Dense(292)` tensor that is the informational bottleneck in the model for visualization or analysis.
 
-Example (using [bh_tsne](https://github.com/lvdmaaten/bhtsne):
+Note that when using `sample_latent.py`, the `--visualize` flag will use PCA and t-SNE to fit a manifold using the implementations of those algorithms found in scikit-learn, which tend to fall over on even medium sized datasets. It's recommended to simply get the latent represetation from that script and then use something else to visualize it.
+
+Example (using [bh_tsne](https://github.com/lvdmaaten/bhtsne)):
 
 ```python sample_latent.py data/processed.h5 model.h5 > data/latent.dat
 cat data/latent.dat | python bhtsne.py -d 2 -p 0.1 > data/result.dat
