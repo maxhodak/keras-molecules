@@ -1,0 +1,53 @@
+# A Keras implementation of Aspuru-Guzik's molecular autoencoder paper
+
+<table style="border-collapse: collapse">
+<tr>
+<td>
+    <strong>Abstract from the paper</strong>
+    <p>We report a method to convert discrete representations of molecules to and from a multidimensional continuous representation. This generative model allows efficient search and optimization through open-ended spaces of chemical compounds.</p>
+    <p>We train deep neural networks on hundreds of thousands of existing chemical structures to construct two coupled functions: an encoder and a decoder. The encoder converts the discrete representation of a molecule into a real-valued continuous vector, and the decoder converts these continuous vectors back to the discrete representation from this latent space.</p>
+    <p>Continuous representations allow us to automatically generate novel chemical structures by performing simple operations in the latent space, such as decoding random vectors, perturbing known chemical structures, or interpolating between molecules. Continuous representations also allow the use of powerful gradient-based optimization to efficiently guide the search for optimized functional compounds. We demonstrate our method in the design of drug-like molecules as well as organic light-emitting diodes.</p>
+</td><td width="300">
+<img src="images/network.png" width="300"></img>
+</td>
+</tr>
+</table>
+
+## Requirements
+
+Install using `pip install -r requirements.txt`.
+
+## Preparing the data
+
+To train the network you need a lot of SMILES strings. The `preprocess.py` script assumes you have an HDF5 file with that contains a table structure, one column of which is named `structure` and contains one SMILES string no longer than 120 characters per row. The script then:
+
+- Normalizes the length of each string to 120 by appending whitespace as needed.
+- Builds a list of the unique characters used in the dataset. (The "charset".)
+- Substitutes each character in each SMILES string with the integer ID of its location in the charset.
+- Converts each character position to a one-hot vector of len(charset).
+- Saves this matrix to the specified output file.
+
+Example:
+
+`python preprocess.py data/dataset.h5 data/processed.h5`
+
+## Training the network
+
+The preprocessed data can be fed into the `train.py` script:
+
+`python train.py data/processed.h5 model.h5 --epochs 20`
+
+If a model file already exists it will be opened and resumed. If it doesn't exist, it will be created.
+
+## Sampling from a trained model
+
+There are two scripts here for sampling from a trained model.
+
+- `sample.py` is useful for just testing the autoencoder.
+- `sample_latent.py` will yield the value of the `Dense(292)` tensor that is the informational bottleneck in the model for visualization or analysis.
+
+Example (using [https://github.com/lvdmaaten/bhtsne](bh_tsne)):
+
+```python sample_latent.py data/processed.h5 model.h5 > data/latent.dat
+cat data/latent.dat | python bhtsne.py -d 2 -p 0.1 > data/result.dat
+python plot.py data/result.dat```
