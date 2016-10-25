@@ -21,7 +21,7 @@
 
 Install using `pip install -r requirements.txt`
 
-A small 50k molecule dataset is included in `data/smiles_50k.h5` for you to explore. 
+A small 50k molecule dataset is included in `data/smiles_50k.h5` to make it easier to play around with the model. 
 
 ## Preparing the data
 
