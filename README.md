@@ -50,7 +50,7 @@ There are two scripts here for sampling from a trained model.
 - `sample.py` is useful for just testing the autoencoder.
 - `sample_latent.py` will yield the value of the `Dense(292)` tensor that is the informational bottleneck in the model for visualization or analysis.
 
-Note that when using `sample_latent.py`, the `--visualize` flag will use PCA and t-SNE to fit a manifold using the implementations of those algorithms found in scikit-learn, which tend to fall over on even medium sized datasets. It's recommended to simply get the latent represetation from that script and then use something else to visualize it.
+Note that when using `sample_latent.py`, the `--visualize` flag will use PCA and t-SNE to fit a manifold using the implementations of those algorithms found in scikit-learn, which tend to fall over on even medium sized datasets. It's recommended to simply get the latent representation from that script and then use something else to visualize it.
 
 Example (using [bh_tsne](https://github.com/lvdmaaten/bhtsne)):
 
@@ -65,3 +65,7 @@ python plot.py data/result.dat
 ## Performance
 
 After 30 epochs on a 500,000 molecule extract from ChEMBL 21 (~7 hours on a NVIDIA GTX 1080), I'm seeing a loss of 0.26 and a reconstruction accuracy of 0.98.
+
+Projecting the dataset onto 2D latent space gives a figure that looks pretty reasonably like Figure 3 from the paper, though there are some strange striations and it's not quite as well spread out as the examples in the paper.
+
+<img src="images/latent_2d.png" />

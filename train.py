@@ -12,15 +12,18 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 NUM_EPOCHS = 1
 BATCH_SIZE = 600
+LATENT_DIM = 292
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='Molecular autoencoder network')
     parser.add_argument('data', type=str, help='The HDF5 file containing preprocessed data.')
     parser.add_argument('model', type=str,
                         help='Where to save the trained model. If this file exists, it will be opened and resumed.')
-    parser.add_argument('--epochs', type=int, default=NUM_EPOCHS,
+    parser.add_argument('--epochs', type=int, metavar='N', default=NUM_EPOCHS,
                         help='Number of epochs to run during training.')
-    parser.add_argument('--batch_size', type=int, default=BATCH_SIZE,
+    parser.add_argument('--latent_dim', type=int, metavar='N', default=LATENT_DIM,
+                        help='Dimensionality of the latent representation.')
+    parser.add_argument('--batch_size', type=int, metavar='N', default=BATCH_SIZE,
                         help='Number of samples to process per minibatch during training.')
     return parser.parse_args()
 
@@ -37,9 +40,9 @@ def main():
     data_train, data_test, charset = load_dataset(args.data)
     model = MoleculeVAE()
     if os.path.isfile(args.model):
-        model.load(charset, args.model)
+        model.load(charset, args.model, latent_rep_size = args.latent_dim)
     else:
-        model.create(charset)
+        model.create(charset, latent_rep_size = args.latent_dim)
     
     checkpointer = ModelCheckpoint(filepath = args.model,
                                    verbose = 1,

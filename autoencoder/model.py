@@ -1,4 +1,3 @@
-
 from keras import backend as K
 from keras import objectives
 from keras.models import Sequential, Model, load_model
@@ -72,5 +71,5 @@ class MoleculeVAE():
     def save(self, filename):
         self.autoencoder.save_weights(filename)
     
-    def load(self, charset, weights_file):
-        self.create(charset, weights_file = weights_file)
+    def load(self, charset, weights_file, latent_rep_size = 292):
+        self.create(charset, weights_file = weights_file, latent_rep_size = latent_rep_size)
