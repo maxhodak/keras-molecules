@@ -21,6 +21,8 @@
 
 Install using `pip install -r requirements.txt`
 
+A small 50k molecule dataset is included in `data/smiles_50k.h5` for you to explore. 
+
 ## Preparing the data
 
 To train the network you need a lot of SMILES strings. The `preprocess.py` script assumes you have an HDF5 file that contains a table structure, one column of which is named `structure` and contains one SMILES string no longer than 120 characters per row. The script then:
@@ -41,7 +43,9 @@ The preprocessed data can be fed into the `train.py` script:
 
 `python train.py data/processed.h5 model.h5 --epochs 20`
 
-If a model file already exists it will be opened and resumed. If it doesn't exist, it will be created. By default, the latent space is 292-D per the paper, and is configurable with the `--latent_dim` flag. If you use a non-default latent dimensionality don't forget to use `--latent_dim` on the other scripts (eg `sample.py`) when you operate on that model checkpoint file or it will be confused.
+If a model file already exists it will be opened and resumed. If it doesn't exist, it will be created.
+
+By default, the latent space is 292-D per the paper, and is configurable with the `--latent_dim` flag. If you use a non-default latent dimensionality don't forget to use `--latent_dim` on the other scripts (eg `sample.py`) when you operate on that model checkpoint file or it will be confused.
 
 ## Sampling from a trained model
 
