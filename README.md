@@ -41,14 +41,14 @@ The preprocessed data can be fed into the `train.py` script:
 
 `python train.py data/processed.h5 model.h5 --epochs 20`
 
-If a model file already exists it will be opened and resumed. If it doesn't exist, it will be created.
+If a model file already exists it will be opened and resumed. If it doesn't exist, it will be created. By default, the latent space is 292-D per the paper, and is configurable with the `--latent_dim` flag. If you use a non-default latent dimensionality don't forget to use `--latent_dim` on the other scripts (eg `sample.py`) when you operate on that model checkpoint file or it will be confused.
 
 ## Sampling from a trained model
 
 There are two scripts here for sampling from a trained model.
 
 - `sample.py` is useful for just testing the autoencoder.
-- `sample_latent.py` will yield the value of the `Dense(292)` tensor that is the informational bottleneck in the model for visualization or analysis.
+- `sample_latent.py` will yield the value of the `Dense(N)` tensor that is the informational bottleneck in the model for visualization or analysis. By default, N is 292 and is configurable with the `--latent_dim` flag on most of the scripts.
 
 Note that when using `sample_latent.py`, the `--visualize` flag will use PCA and t-SNE to fit a manifold using the implementations of those algorithms found in scikit-learn, which tend to fall over on even medium sized datasets. It's recommended to simply get the latent representation from that script and then use something else to visualize it.
 
