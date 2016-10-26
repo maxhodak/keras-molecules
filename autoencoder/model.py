@@ -41,7 +41,7 @@ class MoleculeVAE():
         h = GRU(501, return_sequences = True)(h)
         h = GRU(501, return_sequences = True)(h)
         h = GRU(501, return_sequences = True)(h)
-        decoded_mean = TimeDistributed(Dense(charset_length, activation='softmax', name='decoded_mean'))(h)
+        decoded_mean = TimeDistributed(Dense(charset_length, activation='softmax'), name='decoded_mean')(h)
 
         def vae_loss(x, x_decoded_mean):
             x = K.flatten(x)
