@@ -9,3 +9,5 @@ psycopg2
 pandas
 tables
 argparse
+pydot==1.0.2
+pyparsing==1.5.2
