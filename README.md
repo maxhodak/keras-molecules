@@ -19,10 +19,13 @@
 
 ## Requirements
 
-Install using `pip install -r requirements.txt` or build a docker container: `docker build .`, 
-optionally with a different TensorFlow binary:
+Install using `pip install -r requirements.txt` or build a docker container: `docker build .`
+
+The docker container can also be built different TensorFlow binary, for example in order to use GPU:
+
 `docker build --build-arg TF_BINARY_URL=https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.11.0rc1-cp27-none-linux_x86_64.whl .`
-(you'll need to ensure the CUDA libraries are installed for this version to work)
+
+You'll need to ensure the proper CUDA libraries are installed for this version to work.
 
 A small 50k molecule dataset is included in `data/smiles_50k.h5` to make it easier to play around with the model. 
 
