@@ -41,7 +41,7 @@ To train the network you need a lot of SMILES strings. The `preprocess.py` scrip
 
 Example:
 
-`python preprocess.py data/dataset.h5 data/processed.h5`
+`python preprocess.py data/smiles_50k.h5 data/processed.h5`
 
 ## Training the network
 
