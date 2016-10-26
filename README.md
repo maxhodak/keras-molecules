@@ -19,7 +19,7 @@
 
 ## Requirements
 
-Install using `pip install -r requirements.txt`
+Install using `pip install -r requirements.txt` or build a docker container: `docker build .`
 
 A small 50k molecule dataset is included in `data/smiles_50k.h5` to make it easier to play around with the model. 
 
