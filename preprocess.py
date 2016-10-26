@@ -6,45 +6,59 @@ from autoencoder.utils import one_hot_array, one_hot_index
 
 from sklearn.cross_validation import train_test_split
 
+MAX_NUM_ROWS = 500000
+SMILES_COL_NAME = 'structure'
+PROPERTY_COL_NAME = None #'standard_value'
+
 def get_arguments():
     parser = argparse.ArgumentParser(description='Prepare data for training')
     parser.add_argument('infile', type=str, help='Input file name')
     parser.add_argument('outfile', type=str, help='Output file name')
+    parser.add_argument('--length', type=int, metavar='N', default = MAX_NUM_ROWS,
+                        help='Maximum number of rows to include (randomly sampled).')
+    parser.add_argument('--smiles_column', type=str, default = SMILES_COL_NAME,
+                        help="Name of the column that contains the SMILES strings. Default: %s" % SMILES_COL_NAME)
+    parser.add_argument('--property_column', type=str, default = PROPERTY_COL_NAME,
+                        help="Name of the column that contains the property values to predict. Default: %s" % \
+                        PROPERTY_COL_NAME)
     return parser.parse_args()
 
+def main():
+    args = get_arguments()
+    data = pandas.read_hdf(args.infile, 'table')
+    keys = data[args.smiles_column].map(len) < 121
 
-def prepare_dataset(in_filename, out_filename):
-    data = pandas.read_hdf(in_filename, 'table')
-    # keys = data['structure'].map(len) < 60
-    # assay_keys = data['assay_id'] == 764847 & keys
+    if args.length <= len(keys):
+        data = data[keys].sample(n = args.length)
+    else:
+        data = data[keys]
 
-    structures = data['structure'][0:500000].map(lambda x: list(x.ljust(120)))
-    # activities = data['standard_value'][keys]
+    structures = data[args.smiles_column].map(lambda x: list(x.ljust(120)))
+
+    if args.property_column:
+        properties = data[args.property_column][keys]
 
     del data
 
+    train_idx, test_idx = train_test_split(xrange(structures.shape[0]), test_size = 0.20)
+
     charset = list(reduce(lambda x, y: set(y) | x, structures, set()))
 
-    string_encoded  = np.array(map(lambda row: one_hot_index(row, charset), structures)).reshape(-1, 60)
     one_hot_encoded = np.array(
         map(lambda row:
             map(lambda x: one_hot_array(x, len(charset)),
                 one_hot_index(row, charset)),
             structures))
 
-    data_train, data_test = train_test_split(one_hot_encoded, test_size=0.20)
-
-    h5f = h5py.File(out_filename, 'w')
+    h5f = h5py.File(args.outfile, 'w')
     h5f.create_dataset('charset', data = charset)
-    h5f.create_dataset('data_train', data = data_train)
-    h5f.create_dataset('data_test', data = data_test)
+    h5f.create_dataset('data_train', data = one_hot_encoded[train_idx])
+    h5f.create_dataset('data_test', data = one_hot_encoded[test_idx])
+
+    if args.property_column:
+        h5f.create_dataset('property_train', data = properties[train_idx])
+        h5f.create_dataset('property_test', data = properties[test_idx])
     h5f.close()
-
-    del one_hot_encoded
-
-def main():
-    args = get_arguments()
-    prepare_dataset(args.infile, args.outfile)
 
 if __name__ == '__main__':
     main()

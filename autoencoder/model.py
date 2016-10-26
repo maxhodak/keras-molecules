@@ -1,15 +1,11 @@
 from keras import backend as K
 from keras import objectives
-from keras.models import Sequential, Model, load_model
+from keras.models import Model
 from keras.layers import Input, Dense, Lambda
-from keras.layers.core import Dense, Activation, Dropout, Flatten, Reshape, TimeDistributedDense, RepeatVector
+from keras.layers.core import Dense, Activation, Flatten, RepeatVector
 from keras.layers.wrappers import TimeDistributed
-from keras.layers.recurrent import LSTM, GRU
-from keras.layers.embeddings import Embedding
-from keras.layers.convolutional import Convolution1D, MaxPooling1D, ZeroPadding1D, UpSampling1D
-from keras.layers.normalization import BatchNormalization
-from keras.callbacks import TensorBoard
-from keras.utils.visualize_util import plot, model_to_dot
+from keras.layers.recurrent import GRU
+from keras.layers.convolutional import Convolution1D
 
 class MoleculeVAE():
 
@@ -17,20 +13,20 @@ class MoleculeVAE():
     
     def create(self,
                charset,
-               original_dim = 120,
+               max_length = 120,
                epsilon_std = 0.01,
                latent_rep_size = 292,
                weights_file = None):
         charset_length = len(charset)
         
-        x = Input(shape=(original_dim, charset_length))
-        h = Convolution1D(9, 9, input_dim=60)(x)
-        h = Convolution1D(9, 9)(h)
-        h = Convolution1D(10, 11)(h)
+        x = Input(shape=(max_length, charset_length))
+        h = Convolution1D(9, 9, activation = 'relu')(x)
+        h = Convolution1D(9, 9, activation = 'relu')(h)
+        h = Convolution1D(10, 11, activation = 'relu')(h)
         h = Flatten()(h)
-        h = Dense(435)(h)
-        z_mean = Dense(latent_rep_size, name='z_mean')(h)
-        z_log_var = Dense(latent_rep_size, name='z_log_var')(h)
+        h = Dense(435, activation = 'relu')(h)
+        z_mean = Dense(latent_rep_size, name='z_mean', activation = 'linear')(h)
+        z_log_var = Dense(latent_rep_size, name='z_log_var', activation = 'linear')(h)
 
         def sampling(args):
             z_mean, z_log_var = args
@@ -40,25 +36,25 @@ class MoleculeVAE():
 
         z = Lambda(sampling)([z_mean, z_log_var])
 
-        h = Dense(latent_rep_size, name='latent_input')(z)
-        h = RepeatVector(original_dim)(h)
+        h = Dense(latent_rep_size, name='latent_input', activation = 'relu')(z)
+        h = RepeatVector(max_length)(h)
         h = GRU(501, return_sequences = True)(h)
         h = GRU(501, return_sequences = True)(h)
         h = GRU(501, return_sequences = True)(h)
-        decoded_mean = TimeDistributedDense(charset_length, activation='softmax', name='decoded_mean')(h)
+        decoded_mean = TimeDistributed(Dense(charset_length, activation='softmax', name='decoded_mean'))(h)
 
         def vae_loss(x, x_decoded_mean):
             x = K.flatten(x)
             x_decoded_mean = K.flatten(x_decoded_mean)
-            xent_loss = original_dim * objectives.binary_crossentropy(x, x_decoded_mean)
+            xent_loss = max_length * objectives.binary_crossentropy(x, x_decoded_mean)
             kl_loss = - 0.5 * K.mean(1 + z_log_var - K.square(z_mean) - K.exp(z_log_var), axis = -1)
             return xent_loss + kl_loss
         
-        encoded_input = Input(shape=(original_dim, latent_rep_size))
+        encoded_input = Input(shape=(max_length, latent_rep_size))
         
         self.autoencoder = Model(x, decoded_mean)
         self.encoder = Model(x, z_mean)
-        #self.decoder = Model(self.autoencoder.get_layer('latent_input')(encoded_input),
+        #self.decoder = Model(self.autoencoder.get_layer('z_mean'),
         #                     self.autoencoder.get_layer('decoded_mean')(encoded_input))
         
         if weights_file:

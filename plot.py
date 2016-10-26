@@ -14,10 +14,14 @@ from rdkit.Chem import Draw
 
 from keras.utils.visualize_util import plot
 
+OUTFILE_NAME = 'image.png'
+
 def get_arguments():
     parser = argparse.ArgumentParser(description='Molecular autoencoder network')
     parser.add_argument('--data', type=str, help='Path for data file to read')
     parser.add_argument('--model', type=str, help='Path for model file to visualize')
+    parser.add_argument('--outfile', type=str, default=OUTFILE_NAME,
+                        help = "Filename to write out. Default: %s" % OUTFILE_NAME)
 
     return parser.parse_args()
 
@@ -31,13 +35,13 @@ def visualize_model(args):
     else:
         raise ValueError("Model file %s doesn't exist" % args.model)
 
-    plot(model.autoencoder, to_file='model.png')
+    plot(model.autoencoder, to_file = args.outfile)
 
 def plot_2d(args):
     data = np.loadtxt(args.data, delimiter='\t')
     figure(figsize=(6, 6))
-    scatter(data[:, 0], data[:, 1], marker='.', linewidth='0', s = 0.2)
-    savefig('foo.png', bbox_inches='tight')
+    scatter(data[:, 0], data[:, 1], marker = '.', linewidth = '0', s = 0.2)
+    savefig(args.outfile, bbox_inches = 'tight')
 
 def main():
     args = get_arguments()
