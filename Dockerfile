@@ -15,7 +15,7 @@ RUN \
   apt-get -y install \
           software-properties-common
 
-RUN apt-get -y install python-pip git postgresql-server-dev-9.5 graphviz
+RUN apt-get -y install python-pip git graphviz
 RUN pip install --upgrade pip
 
 COPY requirements.txt /tmp
