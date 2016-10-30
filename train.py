@@ -27,14 +27,6 @@ def get_arguments():
                         help='Number of samples to process per minibatch during training.')
     return parser.parse_args()
 
-def train(network, data_train, data_test, epochs, batch_size, callbacks=[], shuffle = True):
-    network.fit(data_train, data_train,
-                shuffle = shuffle,
-                nb_epoch = epochs,
-                batch_size = batch_size,
-                callbacks = callbacks,
-                validation_data = (data_test, data_test))
-
 def main():
     args = get_arguments()
     data_train, data_test, charset = load_dataset(args.data)
@@ -43,21 +35,25 @@ def main():
         model.load(charset, args.model, latent_rep_size = args.latent_dim)
     else:
         model.create(charset, latent_rep_size = args.latent_dim)
-    
+
     checkpointer = ModelCheckpoint(filepath = args.model,
                                    verbose = 1,
                                    save_best_only = True)
+
     reduce_lr = ReduceLROnPlateau(monitor = 'val_loss',
                                   factor = 0.2,
                                   patience = 3,
                                   min_lr = 0.0001)
 
-    train(model.autoencoder,
-          data_train,
-          data_test,
-          args.epochs,
-          args.batch_size,
-          callbacks = [checkpointer, reduce_lr])
+    model.autoencoder.fit(
+        data_train,
+        data_train,
+        shuffle = True,
+        nb_epoch = args.epochs,
+        batch_size = args.batch_size,
+        callbacks = [checkpointer, reduce_lr],
+        validation_data = (data_test, data_test)
+    )
 
 if __name__ == '__main__':
     main()
