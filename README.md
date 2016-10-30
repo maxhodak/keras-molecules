@@ -55,21 +55,16 @@ By default, the latent space is 292-D per the paper, and is configurable with th
 
 ## Sampling from a trained model
 
-There are two scripts here for sampling from a trained model.
+The `sample.py` script can be used to either run the full autoencoder (for testing) or either the encoder or decoder halves using the `--target` parameter. The data file must include a charset field.
 
-- `sample.py` is useful for just testing the autoencoder.
-- `sample_latent.py` will yield the value of the `Dense(N)` tensor that is the informational bottleneck in the model for visualization or analysis. By default, N is 292 and is configurable with the `--latent_dim` flag on most of the scripts.
-
-Note that when using `sample_latent.py`, the `--visualize` flag will use PCA and t-SNE to fit a manifold using the implementations of those algorithms found in scikit-learn, which tend to fall over on even medium sized datasets. It's recommended to simply get the latent representation from that script and then use something else to visualize it.
-
-Example (using [bh_tsne](https://github.com/lvdmaaten/bhtsne)):
+Examples:
 
 ```
-python sample_latent.py data/processed.h5 model.h5 > data/latent.dat
+python sample.py data/processed.h5 model.h5 --target autoencoder
 
-cat data/latent.dat | python bhtsne.py -d 2 -p 0.1 > data/result.dat
+python sample.py data/processed.h5 model.h5 --target encoder --save_h5 encoded.h5
 
-python plot.py data/result.dat
+python sample.py target/encoded.h5 model.h5 --target decoder
 ```
 
 ## Performance
