@@ -19,6 +19,8 @@ LATENT_DIM = 292
 def get_arguments():
     parser = argparse.ArgumentParser(description='Molecular autoencoder network')
     parser.add_argument('model', type=str, help='Trained Keras model to use.')
+    parser.add_argument('input_data', type=str,
+                        help='h5 file to sample from as input to model.')
     parser.add_argument('--latent_dim', type=int, metavar='N', default=LATENT_DIM,
                         help='Dimensionality of the latent representation.')
     return parser.parse_args()
@@ -27,7 +29,7 @@ def main():
     args = get_arguments()
     model = MoleculeVAE()
     
-    data, charset = load_dataset('data/all_smiles_120_one_hot.h5', split = False)
+    data, charset = load_dataset(args.input_data, split = False)
     
     if os.path.isfile(args.model):
         model.load(charset, args.model, latent_rep_size = args.latent_dim)
