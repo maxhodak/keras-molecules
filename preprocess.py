@@ -48,7 +48,8 @@ def main():
 
     del data
 
-    train_idx, test_idx = train_test_split(xrange(structures.shape[0]), test_size = 0.20)
+    train_idx, test_idx = map(np.array,
+                              train_test_split(structures.index, test_size = 0.20))
 
     charset = list(reduce(lambda x, y: set(y) | x, structures, set()))
 
