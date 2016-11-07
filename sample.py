@@ -4,6 +4,7 @@ import argparse
 import os
 import h5py
 import numpy as np
+import sys
 
 from autoencoder.model import MoleculeVAE
 from autoencoder.utils import one_hot_array, one_hot_index, from_one_hot_array, \
