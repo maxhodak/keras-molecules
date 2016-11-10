@@ -56,8 +56,8 @@ def main():
     dest_x_latent = model.encoder.predict(dest_encoded.reshape(1, args.width, len(charset)))
     
     step = (dest_x_latent - source_x_latent)/float(args.steps)
-    print args.source
-    print
+    print(args.source)
+    print()
     for i in range(args.steps):
         item = source_x_latent + (step  * i)
         sampled = model.decoder.predict(item.reshape(1, latent_dim)).argmax(axis=2)[0]
@@ -65,8 +65,8 @@ def main():
         print(sampled)
         check = Chem.MolFromSmiles(sampled)
 
-    print
-    print args.dest
+    print()
+    print(args.dest)
 
 
 
