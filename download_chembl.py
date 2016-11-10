@@ -1,7 +1,6 @@
+import import_smiles
+import os
 import argparse
-import gzip
-import pandas
-import tempfile
 import urllib
 
 DEFAULT_URI = 'ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_22_chemreps.txt.gz'
@@ -15,22 +14,12 @@ def get_arguments():
 
 def main():
     args = get_arguments()
-    tfile = tempfile.NamedTemporaryFile()
-    fname = tfile.name
+    fname = os.path.basename(args.uri)
 
     urllib.urlretrieve(args.uri, fname)
 
-    f = gzip.GzipFile(fname)
-    d = {}
-    for line in f.readlines()[1:]:
-        s = line.split()
-        i = int(s[0][6:])
-        d[i] = s[1]
-
-    keys = d.keys()
-    keys.sort()
-    frame = pandas.DataFrame(dict(structure=[d[key] for key in keys]))
-    frame.to_hdf(args.outfile, 'table')
+    d = import_smiles.read_smiles(fname, column=1)
+    import_smiles.create_h5(d, args.outfile)
 
 if __name__ == '__main__':
     main()
