@@ -4,7 +4,7 @@ import h5py
 import numpy as np
 from autoencoder.utils import one_hot_array, one_hot_index
 
-from sklearn.cross_validation import train_test_split
+from sklearn.model_selection import train_test_split
 
 MAX_NUM_ROWS = 500000
 SMILES_COL_NAME = 'structure'
