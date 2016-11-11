@@ -1,3 +1,5 @@
+from __future__ import print_function
+
 import h5py
 import numpy
 import os
@@ -6,7 +8,6 @@ import sample
 from autoencoder.model import MoleculeVAE
 from autoencoder.utils import decode_smiles_from_indexes
 from autoencoder.utils import one_hot_array, one_hot_index
-from rdkit import Chem
 
 SOURCE = 'Cc1ccnc(c1)NC(=O)Cc2cccc3c2cccc3'
 DEST = 'c1cc(cc(c1)Cl)NNC(=O)c2cc(cnc2)Br'
@@ -29,10 +30,30 @@ def get_arguments():
     parser.add_argument('--steps', type=int, default=STEPS,
                         help='Number of steps to take while interpolating between source and dest')
     return parser.parse_args()
+
+def interpolate(source, dest, steps, charset, model, latent_dim, width):
+    source_just = source.ljust(width)
+    dest_just = dest.ljust(width)
+    one_hot_encoded_fn = lambda row: map(lambda x: one_hot_array(x, len(charset)),
+                                                one_hot_index(row, charset))
+    source_encoded = numpy.array(map(one_hot_encoded_fn, source_just))
+    source_x_latent = model.encoder.predict(source_encoded.reshape(1, width, len(charset)))
+    dest_encoded = numpy.array(map(one_hot_encoded_fn, dest_just))
+    dest_x_latent = model.encoder.predict(dest_encoded.reshape(1, width, len(charset)))
+    
+    step = (dest_x_latent - source_x_latent)/float(steps)
+    results = []
+    for i in range(steps):
+        item = source_x_latent + (step  * i)
+        sampled = model.decoder.predict(item.reshape(1, latent_dim)).argmax(axis=2)[0]
+        sampled = decode_smiles_from_indexes(sampled, charset)
+        results.append( (i, item, sampled) )
+
+    return results
     
 def main():
     args = get_arguments()
-    latent_dim = args.latent_dim
+
     if os.path.isfile(args.data):
         h5f = h5py.File(args.data, 'r')
         charset = list(h5f['charset'][:])
@@ -42,34 +63,13 @@ def main():
 
     model = MoleculeVAE()
     if os.path.isfile(args.model):
-        model.load(charset, args.model, latent_rep_size = latent_dim)
+        model.load(charset, args.model, latent_rep_size = args.latent_dim)
     else:
         raise ValueError("Model file %s doesn't exist" % args.model)
-    
-    source_just = args.source.ljust(args.width)
-    dest_just = args.dest.ljust(args.width)
-    one_hot_encoded_fn = lambda row: map(lambda x: one_hot_array(x, len(charset)),
-                                                one_hot_index(row, charset))
-    source_encoded = numpy.array(map(one_hot_encoded_fn, source_just))
-    source_x_latent = model.encoder.predict(source_encoded.reshape(1, args.width, len(charset)))
-    dest_encoded = numpy.array(map(one_hot_encoded_fn, dest_just))
-    dest_x_latent = model.encoder.predict(dest_encoded.reshape(1, args.width, len(charset)))
-    
-    step = (dest_x_latent - source_x_latent)/float(args.steps)
-    print(args.source)
-    print()
-    for i in range(args.steps):
-        item = source_x_latent + (step  * i)
-        sampled = model.decoder.predict(item.reshape(1, latent_dim)).argmax(axis=2)[0]
-        sampled = decode_smiles_from_indexes(sampled, charset)
-        print(sampled)
-        check = Chem.MolFromSmiles(sampled)
-
-    print()
-    print(args.dest)
-
-
+                     
+    results = interpolate(args.source, args.dest, args.steps, charset, model, args.latent_dim, args.width)
+    for result in results:
+        print(result[0], result[2])
 
 if __name__ == '__main__':
     main()
-
