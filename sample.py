@@ -6,8 +6,8 @@ import h5py
 import numpy as np
 import sys
 
-from autoencoder.model import MoleculeVAE
-from autoencoder.utils import one_hot_array, one_hot_index, from_one_hot_array, \
+from molecules.model import MoleculeVAE
+from molecules.utils import one_hot_array, one_hot_index, from_one_hot_array, \
     decode_smiles_from_indexes, load_dataset
 
 from pylab import figure, axes, scatter, title, show
@@ -95,4 +95,3 @@ def main():
 
 if __name__ == '__main__':
     main()
-
