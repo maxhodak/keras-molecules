@@ -27,13 +27,17 @@ The docker container can also be built different TensorFlow binary, for example 
 
 You'll need to ensure the proper CUDA libraries are installed for this version to work.
 
-## Included datasets
+## Getting the datasets
 
-A small 50k molecule dataset is included in `data/smiles_50k.h5` to make it easier to get started playing around with the model.
+A small 50k molecule dataset is included in `data/smiles_50k.h5` to make it easier to get started playing around with the model. A much larger 500k ChEMBL 21 extract is also included in `data/smiles_500k.h5`. A model trained on `smiles_500k.h5` is included in `data/model_500k.h5`.
 
-A much larger 500k ChEMBL 21 extract is included in `data/smiles_500k.h5`. A model trained on `smiles_500k.h5` is included in `data/model_500k.h5`.
+All h5 files in this repo by [git-lfs](https://git-lfs.github.com/) rather than included directly in the repo.
 
-All h5 files are referenced by [git-lfs](https://git-lfs.github.com/) rather than included directly in the repo.
+To download original datasets to work with, you can use the `download_dataset.py` script:
+
+* `python download_dataset.py --dataset zinc12`
+* `python download_dataset.py --dataset chembl22`
+* `python download_dataset.py --uri http://my-domain.com/my-file.csv --outfile data/my-file.csv`
 
 ## Preparing the data
 

@@ -5,9 +5,9 @@ import numpy
 import os
 import argparse
 import sample
-from autoencoder.model import MoleculeVAE
-from autoencoder.utils import decode_smiles_from_indexes
-from autoencoder.utils import one_hot_array, one_hot_index
+from molecules.model import MoleculeVAE
+from molecules.utils import decode_smiles_from_indexes
+from molecules.utils import one_hot_array, one_hot_index
 
 SOURCE = 'Cc1ccnc(c1)NC(=O)Cc2cccc3c2cccc3'
 DEST = 'c1cc(cc(c1)Cl)NNC(=O)c2cc(cnc2)Br'
@@ -40,7 +40,7 @@ def interpolate(source, dest, steps, charset, model, latent_dim, width):
     source_x_latent = model.encoder.predict(source_encoded.reshape(1, width, len(charset)))
     dest_encoded = numpy.array(map(one_hot_encoded_fn, dest_just))
     dest_x_latent = model.encoder.predict(dest_encoded.reshape(1, width, len(charset)))
-    
+
     step = (dest_x_latent - source_x_latent)/float(steps)
     results = []
     for i in range(steps):
@@ -50,7 +50,7 @@ def interpolate(source, dest, steps, charset, model, latent_dim, width):
         results.append( (i, item, sampled) )
 
     return results
-    
+
 def main():
     args = get_arguments()
 
@@ -66,7 +66,7 @@ def main():
         model.load(charset, args.model, latent_rep_size = args.latent_dim)
     else:
         raise ValueError("Model file %s doesn't exist" % args.model)
-                     
+
     results = interpolate(args.source, args.dest, args.steps, charset, model, args.latent_dim, args.width)
     for result in results:
         print(result[0], result[2])
