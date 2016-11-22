@@ -73,7 +73,7 @@ class SmilesDataGenerator(object):
 
   def encode(self, word):
     padded_word = word + self.pad_char*(self.maxlen-len(word))
-    return self.table.encode(word)
+    return self.table.encode(padded_word)
 
   def weight(self, word):
     weight_vec = np.ones((self.maxlen,))*self.pad_weight
