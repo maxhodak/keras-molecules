@@ -12,9 +12,10 @@ from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 NUM_EPOCHS = 1
 EPOCH_SIZE = 500000
-BATCH_SIZE = 600
+BATCH_SIZE = 500
 LATENT_DIM = 292
 MAX_LEN = 120
+TEST_SPLIT = 0.20
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='Molecular autoencoder network')
@@ -29,6 +30,9 @@ def get_arguments():
                         help='Number of samples to process per minibatch during training.')
     parser.add_argument('--epoch_size', type=int, metavar='N', default=EPOCH_SIZE,
                         help='Number of samples to process per epoch during training.')
+    parser.add_argument('--test_split', type=float, metavar='N', default=TEST_SPLIT,
+                        help='Fraction of dataset to use as test data, rest is
+                        training data.')
     return parser.parse_args()
 
 def main():
@@ -42,7 +46,8 @@ def main():
     # structures = [line.split()[0].strip() for line in gzip.open(filepath) if line]
 
     # can also use CanonicalSmilesDataGenerator
-    datobj = SmilesDataGenerator(structures, MAX_LEN)
+    datobj = SmilesDataGenerator(structures, MAX_LEN,
+                                 test_split=args.test_split)
     test_divisor = int((1 - datobj.test_split) / (datobj.test_split))
     train_gen = datobj.train_generator(args.batch_size)
     test_gen = datobj.test_generator(args.batch_size)
