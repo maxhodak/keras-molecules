@@ -33,14 +33,19 @@ def get_arguments():
 
 def main():
     args = get_arguments()
-    data_train, data_test, charset = load_dataset(args.data)
-    data = pd.read_hdf(args.data)
-    structures = data['structures']
+
+    data = pd.read_hdf(args.data, 'table')
+    structures = data['structure']
+
+    # import gzip
+    # filepath = args.data
+    # structures = [line.split()[0].strip() for line in gzip.open(filepath) if line]
 
     # can also use CanonicalSmilesDataGenerator
     datobj = SmilesDataGenerator(structures, MAX_LEN)
-    train_gen = datobj.train_generator(BATCH_SIZE)
-    test_gen = datobj.test_generator(BATCH_SIZE)
+    test_divisor = int((1 - datobj.test_split) / (datobj.test_split))
+    train_gen = datobj.train_generator(args.batch_size)
+    test_gen = datobj.test_generator(args.batch_size)
 
     # reformulate generators to not use weights
     train_gen = ((tens, tens) for (tens, _, weights) in train_gen)
@@ -50,7 +55,7 @@ def main():
     if os.path.isfile(args.model):
         model.load(datobj.chars, args.model, latent_rep_size = args.latent_dim)
     else:
-        model.create(datobj.charset, latent_rep_size = args.latent_dim)
+        model.create(datobj.chars, latent_rep_size = args.latent_dim)
 
     checkpointer = ModelCheckpoint(filepath = args.model,
                                    verbose = 1,
@@ -63,13 +68,11 @@ def main():
 
     model.autoencoder.fit_generator(
         train_gen,
-        EPOCH_SIZE,
-        shuffle = True,
+        args.epoch_size,
         nb_epoch = args.epochs,
-        batch_size = args.batch_size,
         callbacks = [checkpointer, reduce_lr],
         validation_data = test_gen,
-        nb_val_samples = EPOCH_SIZE / 5,
+        nb_val_samples = args.epoch_size / test_divisor,
         pickle_safe = True
     )
 
