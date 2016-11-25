@@ -3,7 +3,7 @@ scipy
 scikit-learn==0.18.0
 https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.11.0rc1-cp27-none-linux_x86_64.whl
 h5py==2.6.0
--e git+https://github.com/fchollet/keras.git#egg=keras
+keras==1.1.1
 matplotlib
 pandas
 tables
