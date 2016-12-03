@@ -8,8 +8,8 @@ import argparse
 import os
 import numpy as np
 
-from autoencoder.model import MoleculeVAE
-from autoencoder.utils import load_dataset
+from molecules.model import MoleculeVAE
+from molecules.utils import load_dataset
 
 from pylab import figure, axes, scatter, title, show, savefig
 

@@ -2,13 +2,12 @@ import argparse
 import pandas
 import h5py
 import numpy as np
-from autoencoder.utils import one_hot_array, one_hot_index
+from molecules.utils import one_hot_array, one_hot_index
 
 from sklearn.model_selection import train_test_split
 
 MAX_NUM_ROWS = 500000
 SMILES_COL_NAME = 'structure'
-PROPERTY_COL_NAME = None #'standard_value'
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='Prepare data for training')
@@ -18,9 +17,8 @@ def get_arguments():
                         help='Maximum number of rows to include (randomly sampled).')
     parser.add_argument('--smiles_column', type=str, default = SMILES_COL_NAME,
                         help="Name of the column that contains the SMILES strings. Default: %s" % SMILES_COL_NAME)
-    parser.add_argument('--property_column', type=str, default = PROPERTY_COL_NAME,
-                        help="Name of the column that contains the property values to predict. Default: %s" % \
-                        PROPERTY_COL_NAME)
+    parser.add_argument('--property_column', type=str,
+                        help="Name of the column that contains the property values to predict. Default: None")
     return parser.parse_args()
 
 def chunk_iterator(dataset, chunk_size=1000):
