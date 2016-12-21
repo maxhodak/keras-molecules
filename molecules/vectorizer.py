@@ -2,6 +2,8 @@ import numpy as np
 import itertools
 import random
 
+random.seed(1337)
+
 class CharacterTable(object):
   '''
   Given a set of characters:
