@@ -8,3 +8,4 @@ matplotlib
 pandas
 tables
 argparse
+progressbar
