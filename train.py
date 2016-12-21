@@ -4,6 +4,7 @@ import argparse
 import os
 import h5py
 import numpy as np
+np.random.seed(1337)
 
 from molecules.model import MoleculeVAE
 from molecules.utils import one_hot_array, one_hot_index, from_one_hot_array, \
