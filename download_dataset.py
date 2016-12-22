@@ -7,7 +7,7 @@ from progressbar import ProgressBar, Percentage, Bar, ETA, FileTransferSpeed
 
 DEFAULTS = {
     "chembl22": {
-        "uri": "ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_22_chemreps.txt.gz",
+        "uri": "ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_22/archived/chembl_22_chemreps.txt.gz",
         "outfile": "data/chembl22.h5"
     },
     "zinc12": {
@@ -37,10 +37,11 @@ def get_arguments():
     if outfile is None:
         parser.error("You must provide an --outfile if using a custom --uri.")
         sys.exit(1)
-    return (uri, outfile)
+    dataset = args.dataset
+    return (uri, outfile, dataset)
 
 def main():
-    uri, outfile = get_arguments()
+    uri, outfile, dataset = get_arguments()
     fd = tempfile.NamedTemporaryFile()
     progress = ProgressBar(widgets=[Percentage(), ' ', Bar(), ' ', ETA(), ' ', FileTransferSpeed()])
 
@@ -51,8 +52,18 @@ def main():
         progress.update(min(count * blockSize, totalSize))
 
     urllib.urlretrieve(uri, fd.name, reporthook = update)
-    df = pandas.read_csv(fd.name, delimiter = '\t')
-    df.to_hdf(outfile, 'table', format = 'table', data_columns = True)
+    if dataset == 'zinc12':
+        df = pandas.read_csv(fd.name, delimiter = '\t')
+        df = df.rename(columns={'SMILES':'structure'})
+        df.to_hdf(outfile, 'table', format = 'table', data_columns = True)
+    elif dataset == 'chembl22':
+        df = pandas.read_table(fd.name,compression='gzip')
+        df = df.rename(columns={'canonical_smiles':'structure'})
+        df.to_hdf(outfile, 'table', format = 'table', data_columns = True)
+        pass
+    else:
+        df = pandas.read_csv(fd.name, delimiter = '\t')
+        df.to_hdf(outfile, 'table', format = 'table', data_columns = True)
 
 if __name__ == '__main__':
     main()
