@@ -7,7 +7,7 @@ from progressbar import ProgressBar, Percentage, Bar, ETA, FileTransferSpeed
 
 DEFAULTS = {
     "chembl22": {
-        "uri": "ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/latest/chembl_22_chemreps.txt.gz",
+        "uri": "ftp://ftp.ebi.ac.uk/pub/databases/chembl/ChEMBLdb/releases/chembl_22/archived/chembl_22_chemreps.txt.gz",
         "outfile": "data/chembl22.h5"
     },
     "zinc12": {
@@ -52,6 +52,7 @@ def main():
 
     urllib.urlretrieve(uri, fd.name, reporthook = update)
     df = pandas.read_csv(fd.name, delimiter = '\t')
+    df = df.rename(columns={'SMILES':'structure'})
     df.to_hdf(outfile, 'table', format = 'table', data_columns = True)
 
 if __name__ == '__main__':
