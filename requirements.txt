@@ -3,9 +3,11 @@ scipy
 scikit-learn==0.18.0
 https://storage.googleapis.com/tensorflow/linux/gpu/tensorflow-0.11.0rc1-cp27-none-linux_x86_64.whl
 h5py==2.6.0
-keras==1.1.1
+keras==1.2.0
 matplotlib
 pandas
 tables
 argparse
 progressbar
+tqdm
+seaborn
