@@ -55,12 +55,15 @@ class SmilesDataGenerator(object):
                pad_char=' ',
                pad_min=1,
                pad_weight=0.0,
-               test_split=0.20):
+               test_split=0.20,
+               random_seed=1337):
     self.maxlen = maxlen
     self.words = words
     self.max_words = len(words)
     self.word_ixs = range(self.max_words)
     self.shuffled_word_ixs = range(self.max_words)
+    self.random_seed = random_seed
+    random.seed(random_seed)
     random.shuffle(self.shuffled_word_ixs)
 
     self.pad_char = pad_char

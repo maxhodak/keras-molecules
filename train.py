@@ -5,14 +5,11 @@ import os
 import h5py
 import numpy as np
 
-from molecules.model import MoleculeVAE
-from molecules.utils import one_hot_array, one_hot_index, from_one_hot_array, \
-    decode_smiles_from_indexes, load_dataset
-from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 NUM_EPOCHS = 1
 BATCH_SIZE = 600
 LATENT_DIM = 292
+RANDOM_SEED = 1337
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='Molecular autoencoder network')
@@ -25,10 +22,19 @@ def get_arguments():
                         help='Dimensionality of the latent representation.')
     parser.add_argument('--batch_size', type=int, metavar='N', default=BATCH_SIZE,
                         help='Number of samples to process per minibatch during training.')
+    parser.add_argument('--random_seed', type=int, metavar='N', default=RANDOM_SEED,
+                        help='Seed to use to start randomizer for shuffling.')
     return parser.parse_args()
 
 def main():
     args = get_arguments()
+    np.random.seed(args.random_seed)
+
+    from molecules.model import MoleculeVAE
+    from molecules.utils import one_hot_array, one_hot_index, from_one_hot_array, \
+        decode_smiles_from_indexes, load_dataset
+    from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
+    
     data_train, data_test, charset = load_dataset(args.data)
     model = MoleculeVAE()
     if os.path.isfile(args.model):
