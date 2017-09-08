@@ -13,6 +13,9 @@ from molecules.utils import load_dataset
 
 from pylab import figure, axes, scatter, title, show, savefig
 
+from rdkit import Chem
+from rdkit.Chem import Draw
+
 from keras.utils.visualize_util import plot
 
 OUTFILE_NAME = 'image.png'

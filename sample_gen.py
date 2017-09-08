@@ -32,6 +32,7 @@ def read_latent_data(filename):
     h5f = h5py.File(filename, 'r')
     data = h5f['latent_vectors'][:]
     charset =  h5f['charset'][:]
+    charset = [ x.decode('utf-8') for x in charset
     h5f.close()
     return (data, charset)
 

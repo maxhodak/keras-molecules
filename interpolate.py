@@ -34,11 +34,11 @@ def get_arguments():
 def interpolate(source, dest, steps, charset, model, latent_dim, width):
     source_just = source.ljust(width)
     dest_just = dest.ljust(width)
-    one_hot_encoded_fn = lambda row: map(lambda x: one_hot_array(x, len(charset)),
-                                                one_hot_index(row, charset))
-    source_encoded = numpy.array(map(one_hot_encoded_fn, source_just))
+    one_hot_encoded_fn = lambda row: list(map(lambda x: one_hot_array(x, len(charset)),
+                                                one_hot_index(row, charset)))
+    source_encoded = numpy.array(list(map(one_hot_encoded_fn, source_just)))
     source_x_latent = model.encoder.predict(source_encoded.reshape(1, width, len(charset)))
-    dest_encoded = numpy.array(map(one_hot_encoded_fn, dest_just))
+    dest_encoded = numpy.array(list(map(one_hot_encoded_fn, dest_just)))
     dest_x_latent = model.encoder.predict(dest_encoded.reshape(1, width, len(charset)))
 
     step = (dest_x_latent - source_x_latent)/float(steps)
@@ -57,6 +57,7 @@ def main():
     if os.path.isfile(args.data):
         h5f = h5py.File(args.data, 'r')
         charset = list(h5f['charset'][:])
+        charset = [ x.decode('utf-8') for x in charset ]
         h5f.close()
     else:
         raise ValueError("Data file %s doesn't exist" % args.data)

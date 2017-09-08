@@ -33,6 +33,7 @@ def read_latent_data(filename):
     h5f = h5py.File(filename, 'r')
     data = h5f['latent_vectors'][:]
     charset =  h5f['charset'][:]
+    charset = [ x.decode('utf-8') for x in charset ]
     h5f.close()
     return (data, charset)
 
@@ -46,7 +47,7 @@ def autoencoder(args, model):
         raise ValueError("Model file %s doesn't exist" % args.model)
 
     sampled = model.autoencoder.predict(data[0].reshape(1, 120, len(charset))).argmax(axis=2)[0]
-    mol = decode_smiles_from_indexes(map(from_one_hot_array, data[0]), charset)
+    mol = decode_smiles_from_indexes(list( map(from_one_hot_array, data[0]), charset))
     sampled = decode_smiles_from_indexes(sampled, charset)
     print(mol)
     print(sampled)

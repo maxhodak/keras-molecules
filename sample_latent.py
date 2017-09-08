@@ -85,7 +85,7 @@ def main():
     model = MoleculeVAE()
 
     data, data_test, charset = load_dataset(args.data)
-
+    charset = [ x.decode('utf-8' for x in charset ]
     if os.path.isfile(args.model):
         model.load(charset, args.model, latent_rep_size = args.latent_dim)
     else:
