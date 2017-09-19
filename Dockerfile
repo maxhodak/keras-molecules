@@ -2,6 +2,9 @@ FROM ubuntu:xenial
 
 ENV DEBIAN_FRONTEND noninteractive
 
+RUN apt update && \
+  apt install locales -y
+
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
