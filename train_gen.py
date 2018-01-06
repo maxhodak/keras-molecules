@@ -6,7 +6,9 @@ import h5py
 import numpy as np
 import pandas as pd
 
+from molecules.model import MoleculeVAE
 from molecules.vectorizer import SmilesDataGenerator
+from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
 
 NUM_EPOCHS = 1
 EPOCH_SIZE = 500000
@@ -14,7 +16,6 @@ BATCH_SIZE = 500
 LATENT_DIM = 292
 MAX_LEN = 120
 TEST_SPLIT = 0.20
-RANDOM_SEED = 1337
 
 def get_arguments():
     parser = argparse.ArgumentParser(description='Molecular autoencoder network')
@@ -30,18 +31,13 @@ def get_arguments():
     parser.add_argument('--epoch_size', type=int, metavar='N', default=EPOCH_SIZE,
                         help='Number of samples to process per epoch during training.')
     parser.add_argument('--test_split', type=float, metavar='N', default=TEST_SPLIT,
-                        help='Fraction of dataset to use as test data, rest is training data.')
-    parser.add_argument('--random_seed', type=int, metavar='N', default=RANDOM_SEED,
-                        help='Seed to use to start randomizer for shuffling.')
+                        help='Fraction of dataset to use as test data, rest is
+                        training data.')
     return parser.parse_args()
 
 def main():
     args = get_arguments()
-    np.random.seed(args.random_seed)
-    
-    from molecules.model import MoleculeVAE
-    from keras.callbacks import ModelCheckpoint, ReduceLROnPlateau
-    
+
     data = pd.read_hdf(args.data, 'table')
     structures = data['structure']
 
@@ -51,8 +47,7 @@ def main():
 
     # can also use CanonicalSmilesDataGenerator
     datobj = SmilesDataGenerator(structures, MAX_LEN,
-                                 test_split=args.test_split,
-                                 random_seed=args.random_seed)
+                                 test_split=args.test_split)
     test_divisor = int((1 - datobj.test_split) / (datobj.test_split))
     train_gen = datobj.train_generator(args.batch_size)
     test_gen = datobj.test_generator(args.batch_size)
@@ -79,7 +74,7 @@ def main():
     model.autoencoder.fit_generator(
         train_gen,
         args.epoch_size,
-        nb_epoch = args.epochs,
+        epochs = args.epochs,
         callbacks = [checkpointer, reduce_lr],
         validation_data = test_gen,
         nb_val_samples = args.epoch_size / test_divisor,

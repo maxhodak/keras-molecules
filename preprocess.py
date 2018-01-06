@@ -3,7 +3,7 @@ import pandas
 import h5py
 import numpy as np
 from molecules.utils import one_hot_array, one_hot_index
-
+from functools import reduce
 from sklearn.model_selection import train_test_split
 
 MAX_NUM_ROWS = 500000
@@ -45,36 +45,40 @@ def main():
         properties = data[args.property_column][keys]
 
     del data
-
-    train_idx, test_idx = map(np.array,
-                              train_test_split(structures.index, test_size = 0.20))
+    # wrap map function with list py3 
+    train_idx, test_idx = list( map(np.array,
+                              train_test_split(structures.index, test_size = 0.20)))
 
     charset = list(reduce(lambda x, y: set(y) | x, structures, set()))
-
-    one_hot_encoded_fn = lambda row: map(lambda x: one_hot_array(x, len(charset)),
-                                                one_hot_index(row, charset))
-
+    # for python 3
+    charset = [ np.string_(x) for x in charset ]
+    #
+ 
+    one_hot_encoded_fn = lambda row: list( map(lambda x: one_hot_array(x, len(charset)),
+                                                one_hot_index(row, charset)))
     h5f = h5py.File(args.outfile, 'w')
     h5f.create_dataset('charset', data = charset)
-
     def create_chunk_dataset(h5file, dataset_name, dataset, dataset_shape,
                              chunk_size=1000, apply_fn=None):
         new_data = h5file.create_dataset(dataset_name, dataset_shape,
                                          chunks=tuple([chunk_size]+list(dataset_shape[1:])))
+        
         for (chunk_ixs, chunk) in chunk_iterator(dataset):
             if not apply_fn:
                 new_data[chunk_ixs, ...] = chunk
             else:
                 new_data[chunk_ixs, ...] = apply_fn(chunk)
-
+    # for python3
+    charset = [ x.decode('utf-8') for x in charset ]
+    print( charset )
     create_chunk_dataset(h5f, 'data_train', train_idx,
                          (len(train_idx), 120, len(charset)),
-                         apply_fn=lambda ch: np.array(map(one_hot_encoded_fn,
-                                                          structures[ch])))
+                         apply_fn=lambda ch: np.array(list(map(one_hot_encoded_fn,
+                                                          structures[ch]))))
     create_chunk_dataset(h5f, 'data_test', test_idx,
                          (len(test_idx), 120, len(charset)),
-                         apply_fn=lambda ch: np.array(map(one_hot_encoded_fn,
-                                                          structures[ch])))
+                         apply_fn=lambda ch: np.array(list(map(one_hot_encoded_fn,
+                                                          structures[ch]))))
 
     if args.property_column:
         h5f.create_dataset('property_train', data = properties[train_idx])

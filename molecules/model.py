@@ -65,7 +65,7 @@ class MoleculeVAE():
         def sampling(args):
             z_mean_, z_log_var_ = args
             batch_size = K.shape(z_mean_)[0]
-            epsilon = K.random_normal(shape=(batch_size, latent_rep_size), mean=0., std = epsilon_std)
+            epsilon = K.random_normal(shape=(batch_size, latent_rep_size), mean=0., stddev = epsilon_std)
             return z_mean_ + K.exp(z_log_var_ / 2) * epsilon
 
         z_mean = Dense(latent_rep_size, name='z_mean', activation = 'linear')(h)
